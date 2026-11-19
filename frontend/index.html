@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BlogCraft AI — Multi-Agent Technical Blog Studio</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap"
+    rel="stylesheet">
+
+  <!-- Highlight.js for Code Highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"
+    id="hljs-theme">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Libraries (CDNs) -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.9/purify.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+</head>
+
+<body>
+  <!-- Background Glow & Grid -->
+  <div class="bg-grid-pattern"></div>
+  <div class="bg-ambient-glow glow-1"></div>
+  <div class="bg-ambient-glow glow-2"></div>
+
+  <!-- App Header -->
+  <header class="app-header">
+    <div class="container header-container">
+      <div class="brand">
+        <div class="brand-logo">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+          </svg>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title">BlogCraft <span class="badge-agentic">Multi-Agent</span></div>
+          <div class="brand-subtitle">LangGraph Technical Writer</div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- API Connection Status -->
+        <button id="btnApiStatus" class="status-pill status-checking" title="Click to test or change API connection">
+          <span class="status-indicator"></span>
+          <span class="status-text">Checking API...</span>
+        </button>
+
+        <!-- Generation History Button -->
+        <button id="btnOpenHistory" class="btn-icon" title="View Generation History">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+            <path d="M3 3v5h5" />
+            <path d="M12 7v5l4 2" />
+          </svg>
+          <span class="history-badge" id="historyCount">0</span>
+        </button>
+
+        <!-- Settings Button -->
+        <button id="btnOpenSettings" class="btn-icon" title="Settings & API Config">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path
+              d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+        </button>
+
+        <!-- Theme Toggle -->
+        <button id="btnThemeToggle" class="btn-icon" title="Toggle Light/Dark Theme">
+          <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <circle cx="12" cy="12" r="4" />
+            <path
+              d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+          </svg>
+          <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-content">
+    <div class="container">
+
+      <!-- HERO / INPUT CARD -->
+      <section class="studio-card" id="inputCard">
+        <div class="studio-header">
+          <div class="studio-badge">
+            <span class="sparkle-icon">✨</span> Autonomous Multi-Agent Generation
+          </div>
+          <h1 class="hero-title">Draft High-Caliber Technical Blogs in Seconds</h1>
+          <p class="hero-desc">
+            Powered by LangGraph: Router &rarr; Tavily Web Research &rarr; Orchestrator &rarr; Parallel Workers &rarr;
+            Gemini Reducer with diagrams.
+          </p>
+        </div>
+
+        <form id="generateForm" class="generate-form">
+          <!-- Topic Input -->
+          <div class="form-group topic-group">
+            <label for="topicInput" class="form-label">
+              <span>Blog Topic or Technical Prompt</span>
+              <span class="label-hint">Be specific for higher quality technical outlines</span>
+            </label>
+            <div class="input-wrapper">
+              <input type="text" id="topicInput" class="form-control form-control-lg"
+                placeholder="e.g. Self-attention mechanisms in transformers, or Postgres 17 query performance" required
+                minlength="3" autocomplete="off" />
+              <button type="button" id="btnClearTopic" class="btn-clear-input" title="Clear topic"
+                style="display: none;">&times;</button>
+            </div>
+          </div>
+
+          <!-- Suggested Topic Chips -->
+          <div class="topic-suggestions">
+            <span class="suggestions-label">Ideas:</span>
+            <button type="button" class="chip"
+              data-topic="Self-attention mechanisms in Transformer models from scratch">Transformers
+              Self-Attention</button>
+            <button type="button" class="chip"
+              data-topic="Building autonomous multi-agent pipelines with LangGraph">LangGraph Multi-Agent
+              Architecture</button>
+            <button type="button" class="chip"
+              data-topic="PostgreSQL vs ClickHouse for high-throughput time series analytics">PostgreSQL vs
+              ClickHouse</button>
+            <button type="button" class="chip"
+              data-topic="Weekly roundup: Top AI breakthroughs and open-source models">Latest AI Models Roundup</button>
+            <button type="button" class="chip"
+              data-topic="Modern distributed caching strategies with Redis 7 and Valkey">Distributed Caching
+              Patterns</button>
+          </div>
+
+          <!-- As-Of Date & Advanced Controls -->
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="asOfInput" class="form-label">
+                <span>As-Of Date (Temporal Anchor)</span>
+                <span class="label-info"
+                  title="Anchor date for freshness windows: open_book (7 days), hybrid (45 days), closed_book (evergreen)">ⓘ
+                  Mode Recency Window</span>
+              </label>
+              <div class="date-input-group">
+                <input type="date" id="asOfInput" class="form-control" />
+                <button type="button" id="btnDateToday" class="btn btn-secondary btn-sm">Today</button>
+              </div>
+            </div>
+
+            <div class="form-group mode-preview-group flex-1">
+              <label class="form-label">Agent Router Routing Logic</label>
+              <div class="router-legend">
+                <span class="legend-badge mode-closed" title="Evergreen topics: internal LLM knowledge only">🟢
+                  closed_book</span>
+                <span class="legend-badge mode-hybrid"
+                  title="Evergreen + modern tool/framework evidence within 45 days">🔵 hybrid</span>
+                <span class="legend-badge mode-open" title="News/weekly roundup: filtered evidence within 7 days">🟣
+                  open_book</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit CTA -->
+          <div class="form-action">
+            <button type="submit" id="btnGenerate" class="btn btn-primary btn-cta">
+              <span class="btn-icon-spark">⚡</span>
+              <span class="btn-text">Generate Blog Post</span>
+              <span class="btn-shortcut">Ctrl+Enter</span>
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- LIVE MULTI-AGENT PROGRESS PIPELINE -->
+      <section class="progress-section" id="progressSection" style="display: none;">
+        <div class="progress-card">
+          <div class="progress-header">
+            <div class="progress-title-wrap">
+              <div class="spinner-circle"></div>
+              <div>
+                <h3 class="progress-title">Orchestrating Multi-Agent Pipeline...</h3>
+                <p class="progress-subtitle" id="progressStatusText">Analyzing topic & routing agent flow...</p>
+              </div>
+            </div>
+            <div class="timer-pill" id="elapsedTimer">00:00</div>
+          </div>
+
+          <!-- Visual Stepper Pipeline -->
+          <div class="agent-stepper">
+            <div class="step-item active" id="step-router">
+              <div class="step-icon">🧭</div>
+              <div class="step-content">
+                <div class="step-name">1. Router Node</div>
+                <div class="step-desc">Classify mode & determine research necessity</div>
+              </div>
+              <div class="step-status">In progress...</div>
+            </div>
+
+            <div class="step-divider"></div>
+
+            <div class="step-item" id="step-research">
+              <div class="step-icon">🔍</div>
+              <div class="step-content">
+                <div class="step-name">2. Tavily Web Research</div>
+                <div class="step-desc">Query search API & deduplicate evidence</div>
+              </div>
+              <div class="step-status">Waiting</div>
+            </div>
+
+            <div class="step-divider"></div>
+
+            <div class="step-item" id="step-orchestrator">
+              <div class="step-icon">📋</div>
+              <div class="step-content">
+                <div class="step-name">3. Orchestrator Node</div>
+                <div class="step-desc">Design structured outline & 5–9 section tasks</div>
+              </div>
+              <div class="step-status">Waiting</div>
+            </div>
+
+            <div class="step-divider"></div>
+
+            <div class="step-item" id="step-worker">
+              <div class="step-icon">⚡</div>
+              <div class="step-content">
+                <div class="step-name">4. Parallel Workers</div>
+                <div class="step-desc">N concurrent agents drafting markdown & code</div>
+              </div>
+              <div class="step-status">Waiting</div>
+            </div>
+
+            <div class="step-divider"></div>
+
+            <div class="step-item" id="step-reducer">
+              <div class="step-icon">🎨</div>
+              <div class="step-content">
+                <div class="step-name">5. Reducer Subgraph</div>
+                <div class="step-desc">Merge sections, plan & generate Gemini diagrams</div>
+              </div>
+              <div class="step-status">Waiting</div>
+            </div>
+          </div>
+
+          <!-- Dynamic Agent Log Ticker -->
+          <div class="agent-ticker">
+            <span class="ticker-badge">AGENT LOG</span>
+            <span class="ticker-message" id="agentTickerMessage">Invoking LangGraph StateGraph...</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- RESULTS DASHBOARD -->
+      <section class="results-section" id="resultsSection" style="display: none;">
+        <!-- Top Metadata & Action Bar -->
+        <div class="result-meta-card">
+          <div class="meta-main">
+            <div class="meta-mode-tag" id="resultModeTag">closed_book</div>
+            <h2 class="result-title" id="resultTitle">Generated Blog Post Title</h2>
+            <div class="meta-stats-row">
+              <div class="meta-stat">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z" />
+                </svg>
+                <span id="statWordCount">0 words</span>
+              </div>
+              <div class="meta-stat">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+                <span id="statReadingTime">0 min read</span>
+              </div>
+              <div class="meta-stat">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <line x1="16" y1="13" x2="8" y2="13" />
+                  <line x1="16" y1="17" x2="8" y2="17" />
+                </svg>
+                <span id="statSectionCount">0 sections</span>
+              </div>
+              <div class="meta-stat" id="statEvidenceWrapper">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <span id="statEvidenceCount">0 sources</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="meta-actions">
+            <button id="btnCopyMarkdown" class="btn btn-secondary" title="Copy raw Markdown to clipboard">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+              </svg>
+              <span>Copy MD</span>
+            </button>
+            <button id="btnDownloadMarkdown" class="btn btn-secondary" title="Download as .md file">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              <span>Download</span>
+            </button>
+            <button id="btnPrintBlog" class="btn btn-secondary" title="Print or Save as PDF">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 6 2 18 2 18 9" />
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                <rect width="12" height="8" x="6" y="14" />
+              </svg>
+              <span>Print / PDF</span>
+            </button>
+            <button id="btnNewBlog" class="btn btn-primary" title="Create another post">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              <span>New Post</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Result Tabs Navigation -->
+        <div class="result-tabs-bar">
+          <div class="tabs-list">
+            <button class="tab-btn active" data-tab="tab-rendered">
+              <span class="tab-icon">📖</span> Rendered Article
+            </button>
+            <button class="tab-btn" data-tab="tab-evidence" id="tabBtnEvidence">
+              <span class="tab-icon">🔍</span> Research Evidence <span class="tab-badge" id="evidenceBadge">0</span>
+            </button>
+            <button class="tab-btn" data-tab="tab-markdown">
+              <span class="tab-icon">📝</span> Raw Markdown
+            </button>
+            <button class="tab-btn" data-tab="tab-details">
+              <span class="tab-icon">⚙️</span> Pipeline Execution
+            </button>
+          </div>
+        </div>
+
+        <!-- Tab 1: Rendered Post View -->
+        <div class="tab-pane active" id="tab-rendered">
+          <div class="article-layout">
+            <!-- Sidebar Table of Contents -->
+            <aside class="article-sidebar" id="articleSidebar">
+              <div class="toc-wrapper">
+                <div class="toc-header">Table of Contents</div>
+                <nav id="tableOfContents" class="toc-nav">
+                  <!-- Populated dynamically via JS -->
+                </nav>
+              </div>
+            </aside>
+
+            <!-- Main Rendered Content -->
+            <article class="article-content" id="renderedContent">
+              <!-- Rendered Markdown goes here -->
+            </article>
+          </div>
+        </div>
+
+        <!-- Tab 2: Evidence & Sources Grid -->
+        <div class="tab-pane" id="tab-evidence">
+          <div class="evidence-panel">
+            <div class="evidence-header-box">
+              <h3>Web Evidence Gathered by Tavily Search</h3>
+              <p>The router identified this topic as requiring external research. Below are the verified search
+                citations utilized by the worker agents.</p>
+              <div class="queries-box" id="queriesBox">
+                <!-- Search queries used -->
+              </div>
+            </div>
+            <div class="evidence-grid" id="evidenceGrid">
+              <!-- Evidence items populated dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3: Raw Markdown Source View -->
+        <div class="tab-pane" id="tab-markdown">
+          <div class="raw-markdown-wrapper">
+            <div class="code-view-toolbar">
+              <span class="code-lang-label">Markdown</span>
+              <button id="btnCopyRawMarkdown" class="btn btn-sm btn-secondary">Copy to Clipboard</button>
+            </div>
+            <pre><code class="language-markdown" id="rawMarkdownContent"></code></pre>
+          </div>
+        </div>
+
+        <!-- Tab 4: Pipeline Execution Details -->
+        <div class="tab-pane" id="tab-details">
+          <div class="pipeline-details-panel">
+            <div class="detail-card">
+              <h4>Routing Execution</h4>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <span class="detail-label">Decision Mode:</span>
+                  <span class="detail-val" id="detailMode">-</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Needs Research:</span>
+                  <span class="detail-val" id="detailNeedsResearch">-</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">As-Of Date:</span>
+                  <span class="detail-val" id="detailAsOf">-</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Recency Window:</span>
+                  <span class="detail-val" id="detailRecency">-</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-card">
+              <h4>Orchestration & File Outputs</h4>
+              <p>Generated files are saved locally on the backend server:</p>
+              <ul class="file-path-list">
+                <li><strong>Markdown output:</strong> <code>outputs/blogs/&lt;slug&gt;.md</code></li>
+                <li><strong>Generated images:</strong> <code>outputs/images/&lt;filename&gt;.png</code></li>
+                <li><strong>Image embedding link:</strong> <code>../images/&lt;filename&gt;</code> (remapped live in web
+                  view)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Image Lightbox Modal -->
+  <div class="modal" id="imageModal">
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+    <div class="modal-dialog image-modal-dialog">
+      <button class="modal-close" id="btnCloseImageModal">&times;</button>
+      <img src="" alt="" id="modalImage" class="modal-img-preview" />
+      <div class="modal-caption" id="modalCaption"></div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal" id="settingsModal">
+    <div class="modal-backdrop" id="settingsBackdrop"></div>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Studio Settings</h3>
+        <button class="modal-close" id="btnCloseSettings">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="apiUrlInput" class="form-label">FastAPI Backend URL</label>
+          <input type="url" id="apiUrlInput" class="form-control" value="http://127.0.0.1:8000" />
+          <p class="form-hint">Default: <code>http://127.0.0.1:8000</code>. Point to your local or hosted uvicorn
+            server.</p>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Connection Health</label>
+          <div class="status-test-row">
+            <span id="testHealthResult" class="health-result-text">Untested</span>
+            <button type="button" id="btnTestApi" class="btn btn-secondary btn-sm">Test Connection</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="btnSaveSettings" class="btn btn-primary">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- History Modal / Drawer -->
+  <div class="modal" id="historyModal">
+    <div class="modal-backdrop" id="historyBackdrop"></div>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Generated Post History</h3>
+        <button class="modal-close" id="btnCloseHistory">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="historyList" class="history-list">
+          <!-- Populated from localStorage -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="btnClearHistory" class="btn btn-danger btn-sm">Clear History</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="container footer-container">
+      <p>BlogCraft Multi-Agent System &bull; Powered by LangGraph, OpenAI gpt-4.1-mini, Tavily &amp; Google Gemini</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+</body>
+
+</html>
