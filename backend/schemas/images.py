@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from typing import List, Literal
-
+from typing import List, Literal, Optional
 from pydantic import BaseModel, Field
 
 
 class ImageSpec(BaseModel):
-    placeholder: str = Field(..., description="e.g. [[IMAGE_1]]")
-    filename: str = Field(..., description="Save under images/, e.g. qkv_flow.png")
+    placeholder: str = Field(default="[[IMAGE_1]]", description="e.g. [[IMAGE_1]]")
+    after_section: str = Field(default="", description="The ## Section heading after which to place this image")
+    filename: str = Field(..., description="Save filename, e.g. qkv_flow.png")
     alt: str
     caption: str
     prompt: str = Field(..., description="Prompt to send to the image model.")
@@ -16,5 +16,5 @@ class ImageSpec(BaseModel):
 
 
 class GlobalImagePlan(BaseModel):
-    md_with_placeholders: str
     images: List[ImageSpec] = Field(default_factory=list)
+    md_with_placeholders: Optional[str] = None

@@ -274,18 +274,28 @@ cp .env.example .env
 Populate the keys in `.env`:
 ```dotenv
 # AWS Bedrock & S3
-AWS_REGION=us-east-1
+AWS_REGION=ap-southeast-2
 AWS_ACCESS_KEY_ID=your-key-id
 AWS_SECRET_ACCESS_KEY=your-secret-key
-BEDROCK_MODEL_ID=anthropic.claude-3-5-sonnet-20241022-v2:0
-S3_BUCKET_NAME=your-s3-bucket-name
+BEDROCK_CHAT_MODEL=anthropic.claude-haiku-4-5-20251001-v1:0
+BEDROCK_IMAGE_MODEL=amazon.nova-2-lite-v1:0
+S3_BUCKET_NAME=blogcraft-ai-2026
+S3_REGION=ap-southeast-2
 
 # Pinecone Vector DB
 PINECONE_API_KEY=your-pinecone-key
 PINECONE_INDEX_NAME=blogcraft-index
+PINECONE_CLOUD=aws
+PINECONE_ENVIRONMENT=us-east-1
 
 # PostgreSQL on Render
-DATABASE_URL=postgresql://user:password@host.oregon-postgres.render.com/dbname
+DATABASE_URL=postgresql://user:password@host.oregon-postgres.render.com/dbname?sslmode=require
+PG_HOST=host.oregon-postgres.render.com
+PG_PORT=5432
+PG_DATABASE=dbname
+PG_USER=user
+PG_PASSWORD=password
+PG_SSL_MODE=require
 
 # Observability
 RIUS_API_KEY=your-glassflow-rius-key

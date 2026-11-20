@@ -8,13 +8,22 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from backend.config import IMAGES_DIR, PROJECT_ROOT
+from backend.config import (
+    IMAGES_DIR,
+    PROJECT_ROOT,
+    S3_BUCKET_NAME,
+    S3_PUBLIC_BASE_URL,
+)
 from backend.graph.main_graph import app as blog_graph
-from backend.utils.files import ensure_output_dirs
+from backend.tools.postgres_db import init_db, save_generation_record
+from backend.utils.files import _safe_slug, ensure_output_dirs
 
-api = FastAPI(title="Blog Writing Agent API")
+api = FastAPI(title="BlogCraft — Autonomous Multi-Agent API")
 
-# Open CORS so a separate frontend (frontend/index.html) can call the API.
+# Initialize database schema on startup
+init_db()
+
+# Open CORS so frontend can call the API smoothly
 api.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -35,11 +44,12 @@ class GenerateResponse(BaseModel):
     queries: List[str]
     evidence: List[dict]
     markdown: str
+    s3_url: Optional[str] = None
 
 
 @api.get("/health")
 def health() -> dict:
-    return {"status": "ok"}
+    return {"status": "ok", "engine": "LangGraph + AWS Bedrock"}
 
 
 @api.post("/generate", response_model=GenerateResponse)
@@ -62,13 +72,35 @@ def generate(req: GenerateRequest) -> GenerateResponse:
         raise HTTPException(status_code=500, detail=f"Generation failed: {e}")
 
     plan = result.get("plan")
+    title = plan.blog_title if plan else req.topic
+    mode = result.get("mode", "")
+    needs_research = bool(result.get("needs_research"))
+    final_md = result.get("final", "")
+
+    s3_url = None
+    if S3_BUCKET_NAME:
+        s3_url = f"{S3_PUBLIC_BASE_URL}/blogs/{_safe_slug(title)}.md"
+
+    # Persist job metadata in PostgreSQL on Render
+    try:
+        save_generation_record(
+            topic=req.topic,
+            title=title,
+            mode=mode,
+            needs_research=needs_research,
+            s3_markdown_url=s3_url,
+        )
+    except Exception:
+        pass
+
     return GenerateResponse(
-        title=plan.blog_title if plan else req.topic,
-        mode=result.get("mode", ""),
-        needs_research=bool(result.get("needs_research")),
+        title=title,
+        mode=mode,
+        needs_research=needs_research,
         queries=result.get("queries", []) or [],
         evidence=[e.model_dump() for e in result.get("evidence", []) or []],
-        markdown=result.get("final", ""),
+        markdown=final_md,
+        s3_url=s3_url,
     )
 
 

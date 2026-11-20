@@ -151,13 +151,22 @@ activemq-data/
 
 # Environments
 .env
+.env.*
+!.env.example
 .envrc
 .venv
 env/
 venv/
+blog-craft/
+blog-agent/
 ENV/
 env.bak/
 venv.bak/
+
+# Project Outputs
+outputs/blogs/*.md
+outputs/images/*
+
 
 # Conda environments
 conda-meta/
